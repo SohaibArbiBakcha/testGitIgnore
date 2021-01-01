@@ -1,0 +1,129 @@
+create user sbplus identified by sbplus2020 account unlock;
+	GRANT ALL PRIVILEGES TO sbplus
+
+create table sbuser(id varchar2(100) primary key, nom varchar2(50),preanom varchar2(50),passeword varchar2(50));
+	insert into sbuser values ('user100'	,'menan'	,'abderazzak'	,'menan2020');
+
+create table niveau_scolaire (idNV varchar2(20) primary key , nv_scolaire varchar2(100));
+
+insert into niveau_scolaire values('1erC','1 ere annee collége');
+insert into niveau_scolaire values('2emC','2 eme annee collége');
+insert into niveau_scolaire values('3emC','3 eme annee collége');
+insert into niveau_scolaire values('1erBSE','1 ere annee bac sciences economique');
+insert into niveau_scolaire values('2emBSE','2 eme annee bac sciences economique');
+insert into niveau_scolaire values('1erBPCSVT','1 er annee bac sciences physiques et svt');
+insert into niveau_scolaire values('2emBPCSVT','2 eme annee bac sciences physiques et svt');
+insert into niveau_scolaire values('1erBSM','1 er annee bac sciences maths');
+insert into niveau_scolaire values('2emBSM','2 eme annee bac sciences maths');
+
+
+create table matiere (idM varchar2(20) primary key , matiere varchar2(100), prix number(10));
+
+insert into matiere values('M1erBSE','mathematique 1ere annee bac sciences economique' , 1000);
+insert into matiere values('M2emBSE','mathematique 2eme annee bac sciences economique' , 1000);
+insert into matiere values('M1erBPCSVT','mathematique 1ere annee bac sciences physiques et svt' , 1000);
+insert into matiere values('M2emBPCSVT','mathematique 2eme annee bac sciences physiques et svt' , 1000);
+insert into matiere values('M1erBSM','mathematique 1ere annee bac sciences maths' , 1000);
+insert into matiere values('M2emBSM','mathematique 2eme annee bac sciences maths' , 1000);
+insert into matiere values('FR','françer', 1000);
+insert into matiere values('AR','arab' , 1000);
+insert into matiere values('AN','anglais' , 1000);
+insert into matiere values('PC','physique chimie' , 1000);
+insert into matiere values('ECO','economie' , 1000);
+insert into matiere values('MaDNB','mathematique DNB(diplome national du brevet français)' , 1000);
+insert into matiere values('BL','bac libre' , 1000);
+insert into matiere values('autres','autre', 1000);
+
+create table parents (cin varchar2(20) primary key,
+					civilite varchar2(10),
+					nom varchar2(50),
+					prenom varchar2(50),
+					adresse varchar2(300),
+					ville varchar2(10),
+					codepostal number(10),
+                    telephone varchar2(20),
+                    email varchar2(100));
+
+create table eleve (idEleve varchar2(20) primary key,
+					nom varchar2(50),
+					prenom varchar2(50),
+					dateNaissance date,
+					adresse varchar2(300),
+					ville varchar2(10),
+					codepostal number(10),
+                    telephone varchar2(20),
+                    email varchar2(100),
+                    cinP varchar2(20) references parents(cin),
+                    idNV varchar2(20) references niveau_scolaire(idNV),
+                    matieres varchar2(300)
+                    );
+
+---------------------------------------------------
+Nouvelle version :
+//
+alter table eleve drop column matieres;
+create table Matiere_etudiant 
+(
+Id_Eleve varchar2(20),
+Id_Matiere varchar2(20),
+constraint Pk_M_E_ID primary key (id_Eleve,id_Matiere),
+constraint Fk_M_E_Eleve foreign key (id_Eleve) references Eleve(ideleve) ,
+constraint Fk_M_E_Matiere foreign key (id_Matiere) references Matiere(idm) 
+
+);
+create table Paiement_Etudiant 
+(
+id_Paiement number(5) primary key,
+Id_Eleve varchar2(20),
+Id_Matiere varchar2(20),
+Mois_Paiement varchar2(20),
+Date_traitement Date,
+Montant number(7,2),
+id_user varchar2(100),
+constraint Fk_P_Eleve foreign key (Id_Eleve) references Eleve(ideleve) ,
+constraint Fk_P_Matiere foreign key (Id_Matiere) references Matiere(idm) ,
+constraint Fk_P_Sbuser foreign key (id_user) references sbuser(id) 
+
+
+);
+create table Historique_User
+(
+ID number(10) primary key,
+Id_user varchar2(100),
+Date_H Date,
+Operation varchar2(200),
+Note varchar2(200),
+constraint Fk_H_U_sbuser foreign key (id_user) references sbuser(id) 
+
+);
+<<<<<<< HEAD
+// Aimane Tarhri 
+--------------------------
+create sequence Sequ_Hist start with 1 ;
+create or replace Procedure P_Historique(id_User varchar2 , Operation varchar2 ) is
+begin 
+
+insert into HISTORIQUE_USER values (Sequ_Hist.nextval,id_User,sysdate,Operation,null);
+
+end ;
+/ 
+show error ;
+
+
+
+
+--------------------------------------------------------------------------------------------
+// modification table user 
+alter table sbuser add (email varchar2(100),type_user varchar2(50));
+delete sbuser where id = 'user100';
+insert into sbuser values ('user100','menan','abderazzak','menan2020','user100@gmail.com','employe');
+
+------------------------------------------------------------
+alter table sbuser add (statu varchar2(50));
+update sbuser  set statu='active' where id='user100';
+update sbuser  set statu='active' where id='admin1';
+update NIVEAU_SCOLAIRE  set NV_SCOLAIRE='2 eme annee bac sciences maths' where idnv='2emBSM';
+insert into niveau_scolaire values('BL','Bac libre');
+commit;
+
+
